@@ -22,6 +22,7 @@ export default function RootLayout({ children }) {
             />
           </a>
         </footer> */}
+        <Analytics />
       </body>
     </html>
   );
