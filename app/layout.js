@@ -10,8 +10,19 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} p-10`}>{children}
+        {/* <footer className="mt-8 text-center">
+          <p className="text-xs text-gray-500 mb-2">This website uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB</p>
+          <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">
+            <img 
+              src="/tmdb_logo.svg" 
+              alt="The Movie Database (TMDB) Logo" 
+              className="h-2 mx-auto"
+            />
+          </a>
+        </footer> */}
+      </body>
     </html>
   );
 }
