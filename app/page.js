@@ -18,7 +18,7 @@ const MovieList = () => {
   const fetchMovies = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/movies?search=${searchQuery}`);
+      const response = await fetch(`https://tmalamud.pythonanywhere.com/api/movies?search=${searchQuery}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -34,7 +34,7 @@ const MovieList = () => {
   const fetchSimilarMovies = async (tconst) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/recommend?tconst=${encodeURIComponent(tconst)}`);
+      const response = await fetch(`https://tmalamud.pythonanywhere.com/api/recommend?tconst=${encodeURIComponent(tconst)}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
