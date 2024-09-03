@@ -13,6 +13,7 @@ export default function MovieDetails() {
   const [movie, setMovie] = useState(null);
   const [similarMovies, setSimilarMovies] = useState([]);
   const [watchProviders, setWatchProviders] = useState(null);
+  const [isLoadingProviders, setIsLoadingProviders] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -21,25 +22,22 @@ export default function MovieDetails() {
     const fetchMovieDetails = async () => {
       setIsLoading(true);
       try {
-        const [movieResponse, similarMoviesResponse, watchProvidersResponse] = await Promise.all([
+        const [movieResponse, similarMoviesResponse] = await Promise.all([
           fetch(`https://tmalamud.pythonanywhere.com/api/movie/${id}`),
-          fetch(`https://tmalamud.pythonanywhere.com/api/recommend?tconst=${id}`),
-          fetch(`/api/movie-providers?id=${id}`)
+          fetch(`https://tmalamud.pythonanywhere.com/api/recommend?tconst=${id}`)
         ]);
 
-        if (!movieResponse.ok || !similarMoviesResponse.ok || !watchProvidersResponse.ok) {
-          throw new Error(`HTTP error! status: ${movieResponse.status} ${similarMoviesResponse.status} ${watchProvidersResponse.status}`);
+        if (!movieResponse.ok || !similarMoviesResponse.ok) {
+          throw new Error(`HTTP error! status: ${movieResponse.status} ${similarMoviesResponse.status}`);
         }
 
-        const [movieData, similarMoviesData, watchProvidersData] = await Promise.all([
+        const [movieData, similarMoviesData] = await Promise.all([
           movieResponse.json(),
-          similarMoviesResponse.json(),
-          watchProvidersResponse.json()
+          similarMoviesResponse.json()
         ]);
 
         setMovie(movieData);
         setSimilarMovies(similarMoviesData.recommendations);
-        setWatchProviders(watchProvidersData.results.AR);
       } catch (error) {
         console.error('Error fetching movie details:', error);
         setError(error.message);
@@ -48,6 +46,25 @@ export default function MovieDetails() {
     };
 
     fetchMovieDetails();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchWatchProviders = async () => {
+      setIsLoadingProviders(true);
+      try {
+        const watchProvidersResponse = await fetch(`/api/movie-providers?id=${id}`);
+        if (!watchProvidersResponse.ok) {
+          throw new Error(`HTTP error! status: ${watchProvidersResponse.status}`);
+        }
+        const watchProvidersData = await watchProvidersResponse.json();
+        setWatchProviders(watchProvidersData.results.AR);
+      } catch (error) {
+        console.error('Error fetching watch providers:', error);
+      }
+      setIsLoadingProviders(false);
+    };
+
+    fetchWatchProviders();
   }, [id]);
 
   if (isLoading) return <div>Loading...</div>;
@@ -113,7 +130,9 @@ export default function MovieDetails() {
             </div>
             <div className="w-full sm:w-auto">
               <h3 className="text-sm font-semibold mb-2 tracking-widest text-gray-400">WHERE TO WATCH</h3>
-              {watchProviders && watchProviders.flatrate ? (
+              {isLoadingProviders ? (
+                <></>
+              ) : watchProviders && watchProviders.flatrate ? (
                 <Card className='p-4'>
                   <div>
                     <a href={watchProviders.link} target="_blank" rel="noopener noreferrer">
@@ -137,6 +156,7 @@ export default function MovieDetails() {
                 <p className="text-sm text-gray-300">No streaming services available in your region. <a href={`https://www.google.com/search?q=${encodeURIComponent(movie.title)}+movie+watch+online`} target="_blank" rel="noopener noreferrer"><span className="text-blue-500">Google it!</span></a></p>
               )}
             </div>
+
           </div>
         </div>
       </div>
