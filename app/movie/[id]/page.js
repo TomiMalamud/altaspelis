@@ -21,8 +21,8 @@ export default function MovieDetails() {
       setIsLoading(true);
       try {
         const [movieResponse, similarMoviesResponse] = await Promise.all([
-          fetch(`http://localhost:5000/api/movie/${id}`),
-          fetch(`http://localhost:5000/api/recommend?tconst=${id}`)
+          fetch(`https://tmalamud.pythonanywhere.com/api/movie/${id}`),
+          fetch(`https://tmalamud.pythonanywhere.com/api/recommend?tconst=${id}`)
         ]);
 
         if (!movieResponse.ok || !similarMoviesResponse.ok) {
@@ -51,9 +51,9 @@ export default function MovieDetails() {
   if (!movie) return <div>No movie found</div>;
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto">
       <div className="flex flex-col md:flex-row mb-8">
-        <div className=" w-3/12">
+        <div className="w-5/12 mx-auto md:w-3/12">
           {movie.poster_path && (
             <Image
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -78,7 +78,7 @@ export default function MovieDetails() {
           <div>
           <a href={`https://www.imdb.com/title/${movie.tconst}/ratings`} target="_blank" rel="noopener noreferrer">
             <p className="text-sm font-semibold mb-1 tracking-widest text-gray-400">IMDb RATING</p>
-            <Card className='p-4 w-3/12 bg-gradient-to-br from-yellow-100/10 to-black trasition transition-all hover:to-yellow-100/10' style={{ borderColor: '#f5c518' }}>
+            <Card className='p-4 w-5/12 md:w-3/12 bg-gradient-to-br from-yellow-100/10 to-black trasition transition-all hover:to-yellow-100/10' style={{ borderColor: '#f5c518' }}>
               <div className="flex items-center">
                 <Star className='h-10 w-10' style={{ color: "#f5c518" }} />
                 <div className='ml-4'>
@@ -99,7 +99,7 @@ export default function MovieDetails() {
       </div>
       <Separator className='my-8'/>
       <h1 className="text-2xl font-bold mb-4">Similar Movies</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {similarMovies.map((movie) => (
           <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
             <div className="cursor-pointer">

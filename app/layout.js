@@ -11,7 +11,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">    
-      <body className={`${inter.className} p-10 text-gray-200 bg-gradient-to-br from-slate-900/80 to-black`}>
+      <body className={`${inter.className} p-6 pt-10 md:p-10 text-gray-200 bg-gradient-to-br from-slate-900/80 to-black`}>
       <header>
       <h1 className="text-2xl font-bold mb-4"><a href="/">The Great Movies</a></h1>
       </header>

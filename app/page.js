@@ -18,7 +18,7 @@ const MovieList = () => {
   const fetchMovies = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/movies?search=${searchQuery}`);
+      const response = await fetch(`https://tmalamud.pythonanywhere.com/api/movies?search=${searchQuery}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -53,7 +53,7 @@ const MovieList = () => {
           placeholder="Search movies..."
           className="text-lg mr-2 h-full bg-black"
         />
-        <Button type="submit" className="mr-2 h-full">
+        <Button type="submit" className="h-full">
           Search
         </Button>
       </form>
@@ -69,7 +69,7 @@ const MovieList = () => {
   };
 
   const renderMovieGrid = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
       {movies.map((movie) => (
         <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
           <div className="cursor-pointer">
@@ -93,7 +93,7 @@ const MovieList = () => {
   }
 
   return (    
-    <div className="container mx-auto p-4">            
+    <div className="container mx-auto">            
       <SearchBar onSearch={handleSearch} onClear={handleClear} currentQuery={searchQuery} />
       {isLoading ? (
         <div>Loading...</div>
