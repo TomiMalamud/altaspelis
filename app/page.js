@@ -84,8 +84,7 @@ const MovieList = () => {
           layout="fill"
           objectFit="cover"
           className={`rounded-sm transition-all duration-200 hover:opacity-90 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-          onLoadingComplete={() => setIsLoading(false)}
-          onError={onError}
+          onLoadingComplete={() => setIsLoading(false)}          
           loading="lazy"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
