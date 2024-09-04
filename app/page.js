@@ -1,8 +1,9 @@
 'use client'
 import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 
 const MovieList = () => {
@@ -11,11 +12,7 @@ const MovieList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    fetchMovies();
-  }, [searchQuery]);
-
-  const fetchMovies = async () => {
+  const fetchMovies = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`https://tmalamud.pythonanywhere.com/api/movies?search=${searchQuery}`);
@@ -29,7 +26,11 @@ const MovieList = () => {
       setError(error.message);
     }
     setIsLoading(false);
-  };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchMovies();
+  }, [fetchMovies]);
 
   const SearchBar = ({ onSearch, onClear, currentQuery }) => {
     const [query, setQuery] = useState(currentQuery);
@@ -68,23 +69,49 @@ const MovieList = () => {
     setSearchQuery('');
   };
 
+  const MovieImage = ({ movie }) => {
+    const [src, setSrc] = useState(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+    const [isLoading, setIsLoading] = useState(true);
+
+    return (
+      <div className="relative aspect-[2/3] w-full">
+        {isLoading && (
+          <Skeleton className="absolute inset-0" />
+        )}
+        <Image 
+          src={src}
+          alt={`${movie.title} poster`}
+          layout="fill"
+          objectFit="cover"
+          className={`rounded-sm transition-all duration-200 hover:opacity-90 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+          onLoadingComplete={() => setIsLoading(false)}
+          onError={onError}
+          loading="lazy"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+        />
+      </div>
+    );
+  };
+
+  const MovieSkeleton = () => (
+    <div className="relative aspect-[2/3] w-full">
+      <Skeleton className="absolute inset-0" />
+    </div>
+  );
+
   const renderMovieGrid = () => (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-      {movies.map((movie) => (
-        <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
-          <div className="cursor-pointer">
-            {movie.poster_path && (
-              <Image 
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={`${movie.title} poster`}
-                width={500}
-                height={500}
-                className="w-full h-auto rounded-sm transition-all duration-200 hover:opacity-90"
-              />
-            )}
-          </div>
-        </Link>
-      ))}
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      {isLoading
+        ? Array.from({ length: 10 }).map((_, index) => (
+            <MovieSkeleton key={index} />
+          ))
+        : movies.map((movie) => (
+            <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
+              <div className="cursor-pointer">
+                {movie.poster_path && <MovieImage movie={movie} />}
+              </div>
+            </Link>
+          ))}
     </div>
   );
   
@@ -93,13 +120,9 @@ const MovieList = () => {
   }
 
   return (    
-    <div className="container mx-auto">            
+    <div className="container mx-auto min-h-screen">            
       <SearchBar onSearch={handleSearch} onClear={handleClear} currentQuery={searchQuery} />
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (        
-        renderMovieGrid()
-      )}
+      {renderMovieGrid()}
     </div>
   );
 };
