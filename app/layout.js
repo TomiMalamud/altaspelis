@@ -6,8 +6,8 @@ import { Separator } from "@/components/ui/separator"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "The Great Movies",
-  description: "Find movies similar to your favorites with The Great Movies app. Discover new films based on what you love, expanding your movie-watching options effortlessly.",
+  title: "Altas Pelis",
+  description: "Encontrá películas parecidas a tus favoritas.",
 };
 
 export default function RootLayout({ children }) {
@@ -15,7 +15,10 @@ export default function RootLayout({ children }) {
     <html lang="en" className="dark">
       <body className={`${inter.className} p-6 pt-10 md:p-10 text-gray-200 bg-gradient-to-br from-slate-900/80 to-black`}>
         <header>
-          <h1 className="text-2xl font-bold mb-4"><a href="/">Altas Pelis</a></h1>
+        <div className="flex items-center mb-4">
+        <img src="/logo.png" alt="Altas Pelis" className="h-10 mr-4" />
+          <h1 className="text-2xl font-bold"><a href="/">Altas Pelis</a></h1>
+        </div>
         </header>
         {children}
         <Separator className="my-12" />
