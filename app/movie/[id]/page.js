@@ -67,16 +67,17 @@ export default function MovieDetails() {
     fetchWatchProviders();
   }, [id]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div></div>;
   if (error) return <div>Error: {error}</div>;
   if (!movie) return <div>No movie found</div>;
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto min-h-screen">
       <div className="flex flex-col md:flex-row mb-8">
         <div className="w-full md:w-3/12 md:hidden">
           {movie.backdrop_path && (
             <Image
+              unoptimized
               src={`https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`}
               alt={`${movie.title} backdrop`}
               width={1280}
@@ -88,6 +89,7 @@ export default function MovieDetails() {
         <div className="w-5/12 mx-auto md:w-3/12 hidden md:block">
           {movie.poster_path && (
             <Image
+              unoptimized
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               alt={`${movie.title} poster`}
               width={500}
@@ -98,14 +100,22 @@ export default function MovieDetails() {
         </div>
         <div className="md:w-2/3 md:pl-8 mt-4 md:mt-0">
           <h1 className="text-3xl font-bold mb-4">{movie.title}</h1>
-          <p className="text-lg mb-4 text-gray-400">{movie.overview}</p>
-          <p className="text-lg text-gray-300 mb-4">{movie.release_date ? `${movie.release_date.split('-')[0]}` : ''} · {Math.floor(movie.runtimeMinutes / 60)}h {movie.runtimeMinutes % 60}min</p>
-          <div className="flex flex-wrap gap-2 mb-6">
+          <p className="mb-4 text-gray-100">{movie.overview}</p>
+          <div className="flex flex-wrap items-center gap-x-2 mb-6">
             {movie.genres.split(' ').map((genre, index) => (
               <Badge key={index} variant="secondary" className="text-sm">
                 {genre}
               </Badge>
             ))}
+          </div>
+          <p className=" text-gray-300 mb-6">{movie.release_date ? `${movie.release_date.split('-')[0]}` : ''} | {Math.floor(movie.runtimeMinutes / 60)} h {movie.runtimeMinutes % 60} min</p>
+          <div className='mb-6'>
+            {movie.director_names && (
+              <p className='text-gray-300'><span className='text-gray-500'>Director:</span> {movie.director_names}</p>
+            )}
+            {movie.actor_names && (
+            <p className='text-gray-300'><span className='text-gray-500'>Stars:</span> {movie.actor_names.replace(/,/g, ', ')}</p>
+            )}
           </div>
           <div className='flex flex-col sm:flex-row w-full gap-6'>
             <div className="w-full sm:w-auto">
@@ -140,6 +150,7 @@ export default function MovieDetails() {
                         {watchProviders.flatrate.map((provider) => (
                           <div key={provider.provider_id} className="flex items-center">
                             <Image
+                              unoptimized
                               src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                               alt={provider.provider_name}
                               width={50}
@@ -170,6 +181,7 @@ export default function MovieDetails() {
             <div className="cursor-pointer">
               {movie.poster_path && (
                 <Image
+                  unoptimized
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                   alt={`${movie.title} poster`}
                   width={500}

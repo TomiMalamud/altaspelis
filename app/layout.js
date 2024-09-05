@@ -16,11 +16,15 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} p-6 pt-10 md:p-10 text-gray-200 bg-gradient-to-br from-slate-900/80 to-black`}>
         <header>
           <div className="flex items-center mb-4">
-            <img src="/logo.png" alt="Altas Pelis" className="h-10 mr-4" />
-            <h1 className="text-2xl font-bold"><a href="/">Altas Pelis</a></h1>
+          <a href="/" className="flex items-center">
+            <img src="/logo.png" alt="Altas Pelis" className="h-10 mr-4 hover:animate-spin" />
+            <h1 className="text-2xl font-bold">Altas Pelis</h1>
+            </a>
           </div>
         </header>
+        <div className="min-h-screen">
         {children}
+        </div>
         <Separator className="my-12" />
         <footer className="text-center items-center">
           <div className="flex items-center">

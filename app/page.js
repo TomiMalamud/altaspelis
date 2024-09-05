@@ -17,7 +17,7 @@ const MovieList = () => {
     try {
       const response = await fetch(`https://tmalamud.pythonanywhere.com/api/movies?search=${searchQuery}`);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`We have a problem fetching the movies: ${response.status}`);
       }
       const data = await response.json();
       setMovies(data.movies);
@@ -81,10 +81,10 @@ const MovieList = () => {
         <Image 
           src={src}
           alt={`${movie.title} poster`}
-          layout="fill"
-          objectFit="cover"
+          width={500}
+          height={500}
           className={`rounded-sm transition-all duration-200 hover:opacity-90 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-          onLoadingComplete={() => setIsLoading(false)}          
+          onLoad={() => setIsLoading(false)}          
           loading="lazy"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
@@ -119,7 +119,7 @@ const MovieList = () => {
   }
 
   return (    
-    <div className="container mx-auto min-h-screen">            
+    <div className="container mx-auto">            
       <SearchBar onSearch={handleSearch} onClear={handleClear} currentQuery={searchQuery} />
       {renderMovieGrid()}
     </div>
