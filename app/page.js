@@ -51,7 +51,7 @@ const MovieList = () => {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search movies..."
+          placeholder="Search movies, directors, actors..."
           className="text-lg mr-2 h-full bg-black"
         />
         <Button type="submit" className="h-full">

@@ -17,39 +17,58 @@ export default function MovieDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
+  const [isLoadingMovie, setIsLoadingMovie] = useState(true);
+  const [isLoadingSimilar, setIsLoadingSimilar] = useState(true);
+  const [errorMovie, setErrorMovie] = useState(null);
+  const [errorSimilar, setErrorSimilar] = useState(null);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
-      setIsLoading(true);
+      setIsLoadingMovie(true);
       try {
-        const [movieResponse, similarMoviesResponse] = await Promise.all([
-          fetch(`https://tmalamud.pythonanywhere.com/api/movie/${id}`),
-          fetch(`https://tmalamud.pythonanywhere.com/api/recommend?tconst=${id}`)
-        ]);
-
-        if (!movieResponse.ok || !similarMoviesResponse.ok) {
-          throw new Error(`HTTP error! status: ${movieResponse.status} ${similarMoviesResponse.status}`);
+        const movieResponse = await fetch(`https://tmalamud.pythonanywhere.com/api/movie/${id}`);
+        if (!movieResponse.ok) {
+          throw new Error(`HTTP error! status: ${movieResponse.status}`);
         }
-
-        const [movieData, similarMoviesData] = await Promise.all([
-          movieResponse.json(),
-          similarMoviesResponse.json()
-        ]);
-
+        const movieData = await movieResponse.json();
         setMovie(movieData);
-        setSimilarMovies(similarMoviesData.recommendations);
       } catch (error) {
         console.error('Error fetching movie details:', error);
-        setError(error.message);
+        setErrorMovie(`Error fetching movie details: ${error.message}`);
       }
-      setIsLoading(false);
+      setIsLoadingMovie(false);
     };
 
-    fetchMovieDetails();
+    if (id) {
+      fetchMovieDetails();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    const fetchSimilarMovies = async () => {
+      setIsLoadingSimilar(true);
+      try {
+        const similarMoviesResponse = await fetch(`https://tmalamud.pythonanywhere.com/api/recommend?tconst=${id}`);
+        if (!similarMoviesResponse.ok) {
+          throw new Error(`HTTP error! status: ${similarMoviesResponse.status}`);
+        }
+        const similarMoviesData = await similarMoviesResponse.json();
+        setSimilarMovies(similarMoviesData.recommendations || []);
+      } catch (error) {
+        console.error('Error fetching similar movies:', error);
+        setErrorSimilar(`Error fetching similar movies: ${error.message}`);
+      }
+      setIsLoadingSimilar(false);
+    };
+
+    if (id) {
+      fetchSimilarMovies();
+    }
   }, [id]);
 
   useEffect(() => {
     const fetchWatchProviders = async () => {
+      if (!id) return;
       setIsLoadingProviders(true);
       try {
         const watchProvidersResponse = await fetch(`/api/movie-providers?id=${id}`);
@@ -57,7 +76,7 @@ export default function MovieDetails() {
           throw new Error(`HTTP error! status: ${watchProvidersResponse.status}`);
         }
         const watchProvidersData = await watchProvidersResponse.json();
-        setWatchProviders(watchProvidersData.results.AR);
+        setWatchProviders(watchProvidersData.results?.AR);
       } catch (error) {
         console.error('Error fetching watch providers:', error);
       }
@@ -67,8 +86,8 @@ export default function MovieDetails() {
     fetchWatchProviders();
   }, [id]);
 
-  if (isLoading) return <div></div>;
-  if (error) return <div>Error: {error}</div>;
+  if (isLoadingMovie) return <div></div>;
+  if (errorMovie) return <div>Error: {errorMovie}</div>;
   if (!movie) return <div>No movie found</div>;
 
   return (
@@ -114,7 +133,7 @@ export default function MovieDetails() {
               <p className='text-gray-300'><span className='text-gray-500'>Director:</span> {movie.director_names}</p>
             )}
             {movie.actor_names && (
-            <p className='text-gray-300'><span className='text-gray-500'>Stars:</span> {movie.actor_names.replace(/,/g, ', ')}</p>
+              <p className='text-gray-300'><span className='text-gray-500'>Stars:</span> {movie.actor_names.replace(/,/g, ', ')}</p>
             )}
           </div>
           <div className='flex flex-col sm:flex-row w-full gap-6'>
@@ -175,24 +194,30 @@ export default function MovieDetails() {
       <Separator className='my-8' />
 
       <h1 className="text-2xl font-bold mb-4">Similar Movies</h1>
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {similarMovies.map((movie) => (
-          <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
-            <div className="cursor-pointer">
-              {movie.poster_path && (
-                <Image
-                  unoptimized
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={`${movie.title} poster`}
-                  width={500}
-                  height={500}
-                  className="w-full h-auto rounded-sm"
-                />
-              )}
-            </div>
-          </Link>
-        ))}
-      </div>
+      {isLoadingSimilar ? (
+        <div></div>
+      ) : errorSimilar ? (
+        <div>Error loading similar movies: {errorSimilar}</div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {similarMovies.map((movie) => (
+            <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
+              <div className="cursor-pointer">
+                {movie.poster_path && (
+                  <Image
+                    unoptimized
+                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    alt={`${movie.title} poster`}
+                    width={500}
+                    height={500}
+                    className="w-full h-auto rounded-sm"
+                  />
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
