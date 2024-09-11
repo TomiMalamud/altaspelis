@@ -1,6 +1,7 @@
 **Check it out here: [Altas Pelis](https://altaspelis.com/)**
 
-Altas Pelis is a movie recommendation system that helps you find movies similar to ones you already enjoy. It works across all streaming platforms (like Netflix, HBO Max, Disney+, etc.), making it easier to discover new films regardless of where they're available.
+Altas Pelis is a content-based movie recommender system that uses Sentence Transformers to generate embeddings for each movie based on its details.
+It computes the cosine similarity matrix on-the-fly for each movie, and it does so very fast!
 
 
 ## How It Works
