@@ -8,14 +8,13 @@ import { Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import MovieImage from '@/components/movie-image';
 
 export default function MovieDetails() {
   const [movie, setMovie] = useState(null);
   const [similarMovies, setSimilarMovies] = useState([]);
   const [watchProviders, setWatchProviders] = useState(null);
   const [isLoadingProviders, setIsLoadingProviders] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { id } = useParams();
   const [isLoadingMovie, setIsLoadingMovie] = useState(true);
   const [isLoadingSimilar, setIsLoadingSimilar] = useState(true);
@@ -133,7 +132,7 @@ export default function MovieDetails() {
               <p className='text-gray-300'><span className='text-gray-500'>Director:</span> {movie.director_names}</p>
             )}
             {movie.actor_names && (
-              <p className='text-gray-300'><span className='text-gray-500'>Stars:</span> {movie.actor_names.replace(/,/g, ', ')}</p>
+              <p className='text-gray-300'><span className='text-gray-500'>Stars:</span> {movie.actor_names}</p>
             )}
           </div>
           <div className='flex flex-col sm:flex-row w-full gap-6'>
@@ -192,10 +191,13 @@ export default function MovieDetails() {
       </div>
 
       <Separator className='my-8' />
-
       <h1 className="text-2xl font-bold mb-4">Similar Movies</h1>
       {isLoadingSimilar ? (
-        <div></div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <MovieImage key={index} isLoading={true} />
+          ))}
+        </div>
       ) : errorSimilar ? (
         <div>Error loading similar movies: {errorSimilar}</div>
       ) : (
@@ -203,21 +205,18 @@ export default function MovieDetails() {
           {similarMovies.map((movie) => (
             <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
               <div className="cursor-pointer">
-                {movie.poster_path && (
-                  <Image
-                    unoptimized
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                    alt={`${movie.title} poster`}
-                    width={500}
-                    height={500}
-                    className="w-full h-auto rounded-sm"
-                  />
-                )}
+                <MovieImage
+                  movie={movie}
+                  width={500}
+                  height={750}
+                  className="w-full h-auto"
+                />
               </div>
             </Link>
           ))}
         </div>
       )}
+
     </div>
   );
 }

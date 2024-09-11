@@ -1,16 +1,16 @@
 'use client'
-import Image from 'next/image';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import MovieImage from '@/components/movie-image';
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
 
   const fetchMovies = useCallback(async () => {
     setIsLoading(true);
@@ -26,6 +26,7 @@ const MovieList = () => {
       setError(error.message);
     }
     setIsLoading(false);
+    setHasSearched(true);
   }, [searchQuery]);
 
   useEffect(() => {
@@ -39,11 +40,6 @@ const MovieList = () => {
       e.preventDefault();
       onSearch(query);
     };
-
-    const handleClear = () => {
-      setQuery('');
-      onClear();
-    };
   
     return (
       <form onSubmit={handleSubmit} className="mb-4 flex items-center h-10">
@@ -52,7 +48,7 @@ const MovieList = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search movies, directors, actors..."
-          className="text-lg mr-2 h-full bg-black"
+          className="text-md md:text-lg mr-2 h-full bg-black"
         />
         <Button type="submit" className="h-full">
           Search
@@ -63,56 +59,46 @@ const MovieList = () => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+    setHasSearched(false);
   };
 
   const handleClear = () => {
     setSearchQuery('');
+    setHasSearched(false);
   };
 
-  const MovieImage = ({ movie }) => {
-    const [src, setSrc] = useState(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
-    const [isLoading, setIsLoading] = useState(true);
+
+  const renderMovieGrid = () => {
+    if (isLoading) {
+      return (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <MovieImage key={index} isLoading={true} />
+          ))}
+        </div>
+      );
+    }
+  
+
+    if (hasSearched && movies.length === 0) {
+      return (
+        <div className="text-center mt-32">
+          <p className="text-xl font-semibold">No movies found</p>
+          <p className="text-gray-400 font-light mt-2">Maybe the movie is too new or not popular enough to have a recommendation yet.</p>
+        </div>
+      );
+    }
 
     return (
-      <div className="relative aspect-[2/3] w-full">
-        {isLoading && (
-          <Skeleton className="absolute inset-0" />
-        )}
-        <Image 
-          src={src}
-          alt={`${movie.title} poster`}
-          width={500}
-          height={500}
-          className={`rounded-sm transition-all duration-200 hover:opacity-90 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-          onLoad={() => setIsLoading(false)}          
-          loading="lazy"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-        />
-      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      {movies.map((movie) => (
+        <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
+          <MovieImage movie={movie} />
+        </Link>
+      ))}
+    </div>
     );
   };
-
-  const MovieSkeleton = () => (
-    <div className="relative aspect-[2/3] w-full">
-      <Skeleton className="absolute inset-0" />
-    </div>
-  );
-
-  const renderMovieGrid = () => (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-      {isLoading
-        ? Array.from({ length: 10 }).map((_, index) => (
-            <MovieSkeleton key={index} />
-          ))
-        : movies.map((movie) => (
-            <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
-              <div className="cursor-pointer">
-                {movie.poster_path && <MovieImage movie={movie} />}
-              </div>
-            </Link>
-          ))}
-    </div>
-  );
   
   if (error) {
     return <div>Error: {error}</div>;
