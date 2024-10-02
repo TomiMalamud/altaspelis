@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const MovieImage = ({ 
-  movie, 
-  width = 500, 
-  height = 750, 
-  isLoading = false, 
-  className = "" 
+const MovieImage = ({
+  movie,
+  width = 500,
+  height = 750,
+  isLoading = false,
+  className = ""
 }) => {
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -27,14 +27,13 @@ const MovieImage = ({
         <Skeleton className="absolute inset-0" />
       )}
       {!isLoading && (
-        <Image 
+        <Image
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
           alt={movie?.title ? `${movie.title} poster` : 'Movie poster'}
           width={width}
           height={height}
-          className={`rounded-sm transition-all duration-200 hover:opacity-90 ${
-            imageLoading ? 'opacity-0' : 'opacity-100'
-          }`}
+          className={`rounded-sm transition-all duration-200 hover:opacity-90 ${imageLoading ? 'opacity-0' : 'opacity-100'
+            }`}
           onLoad={handleImageLoad}
           onError={handleImageError}
           loading="lazy"
