@@ -13,7 +13,7 @@ const translations = {
     noMoviesMessage: "Maybe the movie is too new or not popular enough to have a recommendation yet.",
     errorFetching: "We have a problem fetching the movies: ",
     languageLabel: "Language",
-    english: "English",
+    english: "Inglés",
     spanish: "Español",    
   },
   es_AR: {
@@ -26,8 +26,8 @@ const translations = {
     noMoviesMessage: "Quizás la película es muy nueva o no es lo suficientemente popular como para tener una recomendación todavía.",
     errorFetching: "Tenemos un problema al obtener las películas: ",
     languageLabel: "Idioma",
-    english: "Inglés",
-    spanish: "Español",
+    english: "English",
+    spanish: "Spanish",
   }
 };
 
@@ -36,42 +36,21 @@ export const LanguageContext = createContext();
 
 // Language Provider
 export const LanguageProvider = ({ children }) => {
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState('en'); // Default to English
 
   useEffect(() => {
-    // Check if a language preference is stored
-    const storedLang = localStorage.getItem('preferredLanguage');
-    if (storedLang && translations[storedLang]) {
-      setLang(storedLang);
-    } else {
-      // Fetch default language from backend
-      fetch('/api/default_language')
-        .then(response => response.json())
-        .then(data => {
-          if (data.default_language && translations[data.default_language]) {
-            setLang(data.default_language);
-            localStorage.setItem('preferredLanguage', data.default_language);
-          } else {
-            // Fallback to browser language
-            const userLang = navigator.language || navigator.userLanguage;
-            if (userLang.startsWith('es') || userLang.startsWith('es_AR')) {
-              setLang('es_AR');
-            } else {
-              setLang('en');
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching default language:', error);
-          // Fallback to browser language
-          const userLang = navigator.language || navigator.userLanguage;
-          if (userLang.startsWith('es') || userLang.startsWith('es_AR')) {
-            setLang('es_AR');
-          } else {
-            setLang('en');
-          }
-        });
-    }
+    // Fetch the default language from the backend
+    fetch('/api/default_language')
+      .then(response => response.json())
+      .then(data => {
+        if (data.default_language && translations[data.default_language]) {
+          setLang(data.default_language);
+          localStorage.setItem('preferredLanguage', data.default_language);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching default language:', error);
+      });
   }, []);
 
   // Function to handle language change
