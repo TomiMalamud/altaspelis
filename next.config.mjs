@@ -9,12 +9,7 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
-  },
-  i18n: {
-    locales: ['en', 'es'], // Define your supported locales here
-    defaultLocale: 'en',    // Set the default locale
-    localeDetection: true,  // Enable automatic locale detection
-  },
+  }
 };
 
 export default nextConfig;
