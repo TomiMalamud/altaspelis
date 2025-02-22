@@ -39,18 +39,24 @@ export const LanguageProvider = ({ children }) => {
   const [lang, setLang] = useState('en'); // Default to English
 
   useEffect(() => {
-    // Fetch the default language from the backend
-    fetch('/api/default_language')
-      .then(response => response.json())
-      .then(data => {
-        if (data.default_language && translations[data.default_language]) {
-          setLang(data.default_language);
-          localStorage.setItem('preferredLanguage', data.default_language);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching default language:', error);
-      });
+    // First check localStorage for user's previous preference
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage && translations[savedLanguage]) {
+      setLang(savedLanguage);
+      return;
+    }
+
+    // If no saved preference, check browser's language
+    const browserLang = navigator.language.toLowerCase();
+    if (browserLang.startsWith('es')) {
+      setLang('es_AR');
+      localStorage.setItem('preferredLanguage', 'es_AR');
+      return;
+    }
+
+    // Default to English for all other cases
+    setLang('en');
+    localStorage.setItem('preferredLanguage', 'en');
   }, []);
 
   // Function to handle language change
