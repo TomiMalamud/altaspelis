@@ -35,10 +35,8 @@ yarn-error.log*
 .pnp/
 .pnp.js
 
-# Dataset and embeddings
+# Dataset
 dataset/
-*.csv
-*.npy
 
 # IDEs and editors
 .idea/
