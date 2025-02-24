@@ -14,9 +14,7 @@ from pathlib import Path
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-# Load the .env file
-env_path = Path("mysite") / ".env"
-load_dotenv(dotenv_path=env_path)
+load_dotenv(dotenv_path=".env")
 
 app = Flask(__name__)
 # Restrict CORS to specific domains
