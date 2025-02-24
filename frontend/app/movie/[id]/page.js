@@ -1,15 +1,15 @@
 'use client';
 
-import Image from 'next/image';
-import { useEffect, useState, useContext } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { Star } from 'lucide-react';
+import MovieImage from '@/components/movie-image';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import MovieImage from '@/components/movie-image';
 import { LanguageContext } from '@/context/language-context';
+import { Star } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useContext, useEffect, useState } from 'react';
 
 export default function MovieDetails() {
   const [movie, setMovie] = useState(null);
@@ -125,12 +125,12 @@ export default function MovieDetails() {
         {/* Movie Details */}
         <div className="md:w-2/3 md:pl-8 mt-4 md:mt-0">
           <h1 className="text-3xl font-bold mb-4">{movie.title}</h1>
-          <p className="mb-4 text-gray-100">{movie.overview}</p>
+          <p className="mb-4 text-slate-400">{movie.overview}</p>
 
           {/* Genres */}
           <div className="flex flex-wrap items-center gap-x-2 mb-6">
             {movie.genres && movie.genres.split(' ').map((genre, index) => (
-              <Badge key={index} variant="secondary" className="text-sm">
+              <Badge key={index} variant="secondary" className="text-sm cursor-pointer-events-none">
                 {genre}
               </Badge>
             ))}
@@ -150,7 +150,12 @@ export default function MovieDetails() {
             )}
             {movie.actor_names && (
               <p className="text-gray-300">
-                <span className="text-gray-500">{t.stars}:</span> {movie.actor_names}
+                <span className="text-gray-500">{t.stars}:</span> {movie.actor_names.split(' ').reduce((acc, curr, i, arr) => {
+                  if (i % 2 === 0) {
+                    return acc + (i > 0 ? ', ' : '') + curr;
+                  }
+                  return acc + ' ' + curr;
+                }, '')}
               </p>
             )}
           </div>

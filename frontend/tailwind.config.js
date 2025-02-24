@@ -58,7 +58,21 @@ module.exports = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
-  		}
+  		},
+  		animation: {
+  			'fade-in': 'fade-in 0.5s ease-out',
+  			'grid': 'grid 20s linear infinite',
+  		},
+  		keyframes: {
+  			'fade-in': {
+  				'0%': { opacity: '0' },
+  				'100%': { opacity: '1' },
+  			},
+  			'grid': {
+  				'0%': { transform: 'translateY(0)' },
+  				'100%': { transform: 'translateY(24px)' },
+  			},
+  		},
   	}
   },
   plugins: [require("tailwindcss-animate")],
