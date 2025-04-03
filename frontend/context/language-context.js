@@ -6,6 +6,7 @@ const translations = {
   en: {
     searchPlaceholder: "Search movies, directors, actors...",
     searchButton: "Search",
+    director: "Director",
     stars: "Stars",
     whereToWatch: "WHERE TO WATCH",
     similar: "Similar Movies",
@@ -19,6 +20,7 @@ const translations = {
   es_AR: {
     searchPlaceholder: "Buscar películas, directores, actores...",
     searchButton: "Buscar",
+    director: "Director",
     stars: "Actores",
     whereToWatch: "DÓNDE VER",
     similar: "Películas Similares",
