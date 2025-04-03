@@ -1,7 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
-import { LanguageContext } from '@/context/language-context';
+import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,7 +12,6 @@ import MovieImage from '@/components/movie-image';
 export default function MovieDetailsClient({ movie, similarMovies }) {
   const [watchProviders, setWatchProviders] = useState(null);
   const [isLoadingProviders, setIsLoadingProviders] = useState(false);
-  const { t } = useContext(LanguageContext);
 
   useEffect(() => {
     const fetchWatchProviders = async () => {
@@ -89,12 +87,12 @@ export default function MovieDetailsClient({ movie, similarMovies }) {
           <div className="mb-6">
             {movie.director_names && (
               <p className="text-gray-300">
-                <span className="text-gray-500">{t.director}:</span> {movie.director_names}
+                <span className="text-gray-500">Director:</span> {movie.director_names}
               </p>
             )}
             {movie.actor_names && (
               <p className="text-gray-300">
-                <span className="text-gray-500">{t.stars}:</span> {movie.actor_names.split(' ').reduce((acc, curr, i, arr) => {
+                <span className="text-gray-500">Stars:</span> {movie.actor_names.split(' ').reduce((acc, curr, i, arr) => {
                   if (i % 2 === 0) {
                     return acc + (i > 0 ? ', ' : '') + curr;
                   }
@@ -109,7 +107,7 @@ export default function MovieDetailsClient({ movie, similarMovies }) {
             {/* IMDb Rating */}
             <div className="w-full sm:w-auto">
               <a href={`https://www.imdb.com/title/${movie.tconst}/ratings`} target="_blank" rel="noopener noreferrer">
-                <p className="text-sm font-semibold mb-2 tracking-widest text-gray-400">{t.imdbRating}</p>
+                <p className="text-sm font-semibold mb-2 tracking-widest text-gray-400">IMDb Rating</p>
                 <Card className="px-6 py-4 bg-gradient-to-br from-yellow-100/10 to-black transition-all hover:to-yellow-100/10" style={{ borderColor: '#f5c518' }}>
                   <div className="flex items-center">
                     <Star className="h-10 w-10" style={{ color: '#f5c518' }} />
@@ -123,7 +121,7 @@ export default function MovieDetailsClient({ movie, similarMovies }) {
                           : movie.numVotes >= 1000
                             ? `${(movie.numVotes / 1000).toFixed(1)}K`
                             : movie.numVotes}{' '}
-                        {t.votes}
+                        votes
                       </p>
                     </div>
                   </div>
@@ -133,7 +131,7 @@ export default function MovieDetailsClient({ movie, similarMovies }) {
 
             {/* Watch Providers */}
             <div className="w-full sm:w-auto">
-              <h3 className="text-sm font-semibold mb-2 tracking-widest text-gray-400">{t.whereToWatch}</h3>
+              <h3 className="text-sm font-semibold mb-2 tracking-widest text-gray-400">WHERE TO WATCH</h3>
               {isLoadingProviders ? (
                 <></>
               ) : watchProviders && watchProviders.flatrate ? (
@@ -169,7 +167,7 @@ export default function MovieDetailsClient({ movie, similarMovies }) {
       <Separator className="my-8" />
 
       {/* Similar Movies */}
-      <h1 className="text-2xl font-bold mb-4">{t.similar}</h1>
+      <h1 className="text-2xl font-bold mb-4">Similar Movies</h1>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {similarMovies.map((similarMovie) => (
           <Link href={`/movie/${similarMovie.tconst}`} key={similarMovie.tconst}>

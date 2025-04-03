@@ -1,4 +1,4 @@
-import MovieListClient from '@/components/movie-list-client';
+import MovieListClient from '@/components/movie-list';
 
 async function getMovies() {
   const response = await fetch('https://tmalamud.pythonanywhere.com/api/movies', { cache: 'no-store' });

@@ -17,11 +17,11 @@ export default function Loading() {
         {/* Movie Details Skeleton */}
         <div className="md:w-2/3 md:pl-8 mt-4 md:mt-0">
           <Skeleton className="h-10 w-3/4 mb-4" />
-          <Skeleton className="h-24 w-full mb-2" />
+          <Skeleton className="h-24 w-full mb-6" />
 
           {/* Genres Skeleton */}
           <div className="flex flex-wrap gap-2 mb-6">
-            {Array(4).fill(0).map((_, i) => (
+            {Array(2).fill(0).map((_, i) => (
               <Skeleton key={i} className="h-6 w-16 rounded-full" />
             ))}
           </div>
@@ -30,8 +30,8 @@ export default function Loading() {
           <Skeleton className="h-4 w-48 mb-6" />
 
           {/* Director and Actors Skeleton */}
-          <Skeleton className="h-4 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-3/4 mb-6" />
+          <Skeleton className="h-4 w-1/2 mb-2" />
+          <Skeleton className="h-4 w-1/2 mb-6" />
 
           {/* Rating and Providers Skeleton */}
           <div className="flex flex-col sm:flex-row w-full gap-6">
@@ -41,7 +41,7 @@ export default function Loading() {
             </div>
             <div className="w-full sm:w-auto mt-4 sm:mt-0">
               <Skeleton className="h-4 w-32 mb-2" />
-              <Skeleton className="h-24 w-48 rounded-md" />
+              <Skeleton className="h-24 w-40 rounded-md" />
             </div>
           </div>
         </div>

@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import MovieImage from '@/components/movie-image';
 import SearchBar from '@/components/search-bar';
-import { LanguageContext } from '@/context/language-context';
 
 export default function MovieListClient({ initialMovies }) {
   const [movies, setMovies] = useState(initialMovies);
@@ -12,14 +11,13 @@ export default function MovieListClient({ initialMovies }) {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
-  const { t } = useContext(LanguageContext);
 
   const fetchMovies = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`https://tmalamud.pythonanywhere.com/api/movies?search=${encodeURIComponent(searchQuery)}`);
       if (!response.ok) {
-        throw new Error(`${t.errorFetching}${response.status}`);
+        throw new Error(`We have a problem fetching the movies: ${response.status}`);
       }
       const data = await response.json();
       setMovies(data.movies);
@@ -29,7 +27,7 @@ export default function MovieListClient({ initialMovies }) {
     }
     setIsLoading(false);
     setHasSearched(true);
-  }, [searchQuery, t]);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -51,8 +49,8 @@ export default function MovieListClient({ initialMovies }) {
       <SearchBar 
         onSearch={handleSearch} 
         currentQuery={searchQuery} 
-        placeholder={t.searchPlaceholder}
-        searchButtonText={t.searchButton}
+        placeholder="Search movies, directors, actors..."
+        searchButtonText="Search"
       />
       {renderMovieGrid()}
     </div>
@@ -72,8 +70,8 @@ export default function MovieListClient({ initialMovies }) {
     if (hasSearched && movies.length === 0) {
       return (
         <div className="text-center mt-32">
-          <p className="text-xl font-semibold">{t.noMoviesFound}</p>
-          <p className="text-gray-400 font-light mt-2">{t.noMoviesMessage}</p>
+          <p className="text-xl font-semibold">No movies found</p>
+          <p className="text-gray-400 font-light mt-2">Maybe the movie is too new or not popular enough to have a recommendation yet.</p>
         </div>
       );
     }
