@@ -1,6 +1,3 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,30 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import MovieImage from '@/components/movie-image';
 
-export default function MovieDetailsClient({ movie, similarMovies }) {
-  const [watchProviders, setWatchProviders] = useState(null);
-  const [isLoadingProviders, setIsLoadingProviders] = useState(false);
-
-  useEffect(() => {
-    const fetchWatchProviders = async () => {
-      if (!movie.tconst) return;
-      setIsLoadingProviders(true);
-      try {
-        const watchProvidersResponse = await fetch(`/api/movie-providers?id=${movie.tconst}`);
-        if (!watchProvidersResponse.ok) {
-          throw new Error(`HTTP error! status: ${watchProvidersResponse.status}`);
-        }
-        const watchProvidersData = await watchProvidersResponse.json();
-        setWatchProviders(watchProvidersData.results?.AR);
-      } catch (error) {
-        console.error('Error fetching watch providers:', error);
-      }
-      setIsLoadingProviders(false);
-    };
-
-    fetchWatchProviders();
-  }, [movie.tconst]);
-
+export default function MovieDetails({ movie, similarMovies, watchProviders }) {
   return (
     <div className="container mx-auto min-h-screen px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col md:flex-row mb-8">
@@ -132,9 +106,7 @@ export default function MovieDetailsClient({ movie, similarMovies }) {
             {/* Watch Providers */}
             <div className="w-full sm:w-auto">
               <h3 className="text-sm font-semibold mb-2 tracking-widest text-gray-400">WHERE TO WATCH</h3>
-              {isLoadingProviders ? (
-                <></>
-              ) : watchProviders && watchProviders.flatrate ? (
+              {watchProviders && watchProviders.flatrate ? (
                 <Card className='p-4'>
                   <div>
                     <a href={watchProviders.link} target="_blank" rel="noopener noreferrer">

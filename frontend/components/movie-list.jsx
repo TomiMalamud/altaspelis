@@ -1,53 +1,11 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import MovieImage from '@/components/movie-image';
 import SearchBar from '@/components/search-bar';
 
-export default function MovieListClient({ initialMovies }) {
-  const [movies, setMovies] = useState(initialMovies);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
-
-  const fetchMovies = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`https://tmalamud.pythonanywhere.com/api/movies?search=${encodeURIComponent(searchQuery)}`);
-      if (!response.ok) {
-        throw new Error(`We have a problem fetching the movies: ${response.status}`);
-      }
-      const data = await response.json();
-      setMovies(data.movies);
-    } catch (error) {
-      console.error('Error fetching movies:', error);
-      setError(error.message);
-    }
-    setIsLoading(false);
-    setHasSearched(true);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    if (searchQuery) {
-      fetchMovies();
-    }
-  }, [fetchMovies, searchQuery]);
-
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    setHasSearched(false);
-  };
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
+export default function MovieList({ movies, searchQuery }) {
   return (
     <div className="container mx-auto">
       <SearchBar 
-        onSearch={handleSearch} 
         currentQuery={searchQuery} 
         placeholder="Search movies, directors, actors..."
         searchButtonText="Search"
@@ -57,20 +15,10 @@ export default function MovieListClient({ initialMovies }) {
   );
 
   function renderMovieGrid() {
-    if (isLoading) {
-      return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <MovieImage key={index} isLoading={true} />
-          ))}
-        </div>
-      );
-    }
-
-    if (hasSearched && movies.length === 0) {
+    if (searchQuery && movies.length === 0) {
       return (
         <div className="text-center mt-32">
-          <p className="text-xl font-semibold">No movies found</p>
+          <p className="text-xl font-semibold">No movies found for "{searchQuery}"</p>
           <p className="text-gray-400 font-light mt-2">Maybe the movie is too new or not popular enough to have a recommendation yet.</p>
         </div>
       );
