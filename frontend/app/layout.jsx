@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
           <div className="relative">
             <header className="flex items-center mb-8 justify-between">
               <div className="flex items-center">
-                <Link href="/" className="flex items-center" aria-label="Home" title="Home" prefetch={true}>
+                <Link href="/" className="flex items-center" aria-label="Home" title="Home" prefetch={false}>
                   <img src="/logo.png" alt="Altas Pelis" className="h-10 mr-4 hover:animate-spin" />
                   <h1 className="text-2xl font-bold">Altas Pelis</h1>
                 </Link>

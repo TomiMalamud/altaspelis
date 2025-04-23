@@ -142,7 +142,7 @@ export default function MovieDetails({ movie, similarMovies, watchProviders }) {
       <h1 className="text-2xl font-bold mb-4">Similar Movies</h1>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {similarMovies.map((similarMovie) => (
-          <Link href={`/movie/${similarMovie.tconst}`} key={similarMovie.tconst}>
+          <Link href={`/movie/${similarMovie.tconst}`} key={similarMovie.tconst} prefetch={false}>
             <div className="cursor-pointer">
               <MovieImage movie={similarMovie} width={500} height={750} className="w-full h-auto" />
             </div>
