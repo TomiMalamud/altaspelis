@@ -27,7 +27,7 @@ export default function MovieList({ movies, searchQuery }) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {movies.map((movie) => (
-          <Link href={`/movie/${movie.tconst}`} key={movie.tconst}>
+          <Link href={`/movie/${movie.tconst}`} key={movie.tconst} prefetch={false}>
             <MovieImage movie={movie} />
           </Link>
         ))}
