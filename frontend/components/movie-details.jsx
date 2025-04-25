@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import MovieImage from '@/components/movie-image';
 
-export default function MovieDetails({ movie, similarMovies, watchProviders }) {
+export default function MovieDetails({ movie, similarMovies }) {
   return (
     <div className="container mx-auto min-h-screen px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col md:flex-row mb-8">
@@ -76,7 +76,6 @@ export default function MovieDetails({ movie, similarMovies, watchProviders }) {
             )}
           </div>
 
-          {/* IMDb Rating and Watch Providers */}
           <div className="flex flex-col sm:flex-row w-full gap-6">
             {/* IMDb Rating */}
             <div className="w-full sm:w-auto">
@@ -101,36 +100,7 @@ export default function MovieDetails({ movie, similarMovies, watchProviders }) {
                   </div>
                 </Card>
               </a>
-            </div>
-
-            {/* Watch Providers */}
-            <div className="w-full sm:w-auto">
-              <h3 className="text-sm font-semibold mb-2 tracking-widest text-gray-400">WHERE TO WATCH</h3>
-              {watchProviders && watchProviders.flatrate ? (
-                <Card className='p-4'>
-                  <div>
-                    <a href={watchProviders.link} target="_blank" rel="noopener noreferrer">
-                      <div className="flex flex-wrap justify-center gap-x-6">
-                        {watchProviders.flatrate.map((provider) => (
-                          <div key={provider.provider_id} className="flex items-center">
-                            <Image
-                              unoptimized
-                              src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
-                              alt={provider.provider_name}
-                              width={50}
-                              height={50}
-                              className="rounded-full"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </a>
-                  </div>
-                </Card>
-              ) : (
-                <p className="text-sm text-gray-300">No streaming services available in your region. <a href={`https://www.google.com/search?q=${encodeURIComponent(movie.title)}+movie+watch+online`} target="_blank" rel="noopener noreferrer"><span className="text-blue-500">Google it!</span></a></p>
-              )}
-            </div>
+            </div>            
           </div>
         </div>
       </div>
