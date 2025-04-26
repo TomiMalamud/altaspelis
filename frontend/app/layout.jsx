@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/react"
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link";
 import Image from "next/image";
@@ -76,8 +76,8 @@ export default function RootLayout({ children }) {
               </p>
             </footer>
           </div>
-          <Analytics />
-        </div>
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX"} />
+          </div>
       </body>
     </html>
   );
