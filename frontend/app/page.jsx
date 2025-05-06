@@ -1,10 +1,7 @@
 import MovieList from '@/components/movie-list';
 
-async function getMovies(searchQuery = '') {
+async function getMovies() {
   const url = new URL('https://tmalamud.pythonanywhere.com/api/movies');
-  if (searchQuery) {
-    url.searchParams.append('search', searchQuery);
-  }
   const response = await fetch(url.toString(), { cache: 'force-cache' });
   if (!response.ok) {
     throw new Error(`Error fetching movies: ${response.status}`);
@@ -13,8 +10,7 @@ async function getMovies(searchQuery = '') {
   return data.movies || [];
 }
 
-export default async function Page({ searchParams }) {
-  const searchQuery = searchParams?.search || '';
-  const movies = await getMovies(searchQuery);
-  return <MovieList movies={movies} searchQuery={searchQuery} />;
+export default async function Page() {
+  const movies = await getMovies();
+  return <MovieList movies={movies} />;
 }
