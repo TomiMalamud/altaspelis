@@ -10,9 +10,12 @@ import requests
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
-from pathlib import Path
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from scipy.stats import lognorm
+from scipy.optimize import minimize
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 load_dotenv(dotenv_path=".env")
 
@@ -256,6 +259,105 @@ def handle_movie_details(tconst):
     return jsonify(json_serializable(parsed_movie))
 
 
+# TAMAR calculation functions
+def getDataV3(variableID):
+    url = f"https://api.bcra.gob.ar/estadisticas/v3.0/Monetarias/{variableID}"
+    r = requests.get(url, verify=False)
+    return pd.DataFrame(r.json().get('results')).set_index('fecha')
+
+
+def calculate_tamar_call_value(target_mean, target_prob, threshold, min_val):
+    try:
+        tamar_tea = getDataV3(variableID=45)['valor'] / 100
+        tamar_tea.index = pd.to_datetime(tamar_tea.index)
+        tamar_tea = tamar_tea.sort_index()
+        tamar_tea = tamar_tea.loc[tamar_tea.index > '2025-01-15']
+        tamar_tem_spot = ((1 + tamar_tea)**(1/12) - 1)
+        tamar_tem = tamar_tem_spot.to_frame(name='tamar_tem_spot')
+
+        def loss(params):
+            mu, sigma = params
+            dist = lognorm(s=sigma, scale=np.exp(mu))
+            mean = dist.mean()
+            prob = 1 - dist.cdf(threshold)
+            penal_mean = (mean - target_mean)**2
+            penal_prob = max(0, target_prob - prob)**2
+            return penal_mean + 10 * penal_prob
+
+        res = minimize(loss, x0=[np.log(target_mean), 0.5], bounds=[(None, None), (1e-3, 2)])
+        mu_opt, sigma_opt = res.x
+        dist = lognorm(s=sigma_opt, scale=np.exp(mu_opt))
+
+        N, MAX = 15, 0.055
+        edges = np.linspace(min_val, MAX, N + 1)
+        centers = 0.5 * (edges[:-1] + edges[1:])
+        probs = dist.cdf(edges[1:]) - dist.cdf(edges[:-1])
+
+        df_calc = pd.DataFrame({'TAMAR_DIC_26_pct': centers, 'proba_pct': probs}).mul(100).round(1)
+
+        TAMAR_MEANS = []
+        for TAMAR_TARGET in df_calc.TAMAR_DIC_26_pct.tolist():
+            tamar_tem1 = tamar_tem.copy()
+            tamar_tem1.index = pd.to_datetime(tamar_tem1.index)
+            last = tamar_tem1.index.max()
+            lv = tamar_tem1.loc[last, 'tamar_tem_spot']
+            nd = pd.bdate_range(last + pd.Timedelta(1, 'D'), '2026-12-15')
+            vals = [lv + (TAMAR_TARGET/100 - lv) * i / len(nd) for i in range(1, len(nd) + 1)]
+            tamar_tem2 = pd.DataFrame({'tamar_tem_spot': vals}, index=nd)
+            tamar_tem1 = pd.concat([tamar_tem1, tamar_tem2]).sort_index()
+            TAMAR_MEANS.append(tamar_tem1.mean().iloc[0] * 100)
+
+        df_calc['TAMAR_MEAN'] = TAMAR_MEANS
+
+        fixed_rate = 2.14
+        months = 22.53
+
+        df_calc['fixed_amort_b100'] = 100 * (1 + fixed_rate/100)**months
+        df_calc['tamar_amort_b100'] = 100 * (1 + df_calc['TAMAR_MEAN']/100)**months
+        df_calc['tamar_diff_b100'] = np.where(
+            df_calc['fixed_amort_b100'] > df_calc['tamar_amort_b100'], 
+            0, 
+            df_calc['tamar_amort_b100'] - df_calc['fixed_amort_b100']
+        )
+
+        call_value_b100 = df_calc['proba_pct'].divide(100) @ df_calc['tamar_diff_b100']
+        
+        return {
+            'call_value_b100': float(call_value_b100),
+            'distribution_data': df_calc.to_dict('records')
+        }
+    
+    except Exception as e:
+        raise Exception(f"Error calculating TAMAR call value: {str(e)}")
+
+
+def handle_tamar_calculation():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "JSON data required"}), 400
+        
+        target_mean = data.get('target_mean')
+        target_prob = data.get('target_prob')
+        threshold = data.get('threshold')
+        min_val = data.get('min_val')
+        
+        if any(param is None for param in [target_mean, target_prob, threshold, min_val]):
+            return jsonify({
+                "error": "Missing required parameters: target_mean, target_prob, threshold, min_val"
+            }), 400
+        
+        if any(not isinstance(param, (int, float)) for param in [target_mean, target_prob, threshold, min_val]):
+            return jsonify({"error": "All parameters must be numeric"}), 400
+        
+        result = calculate_tamar_call_value(target_mean, target_prob, threshold, min_val)
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"Error in handle_tamar_calculation: {e}")
+        return jsonify({"error": "An error occurred processing your request"}), 500
+
+
 # Route decorators
 def route_handler(route, methods=["GET"]):
     def decorator(f):
@@ -286,6 +388,12 @@ def recommend_endpoint():
 @limiter.limit("60/minute")
 def movie_details_endpoint(tconst):
     return handle_movie_details(tconst)
+
+
+@app.route("/api/tamar-calculation", methods=["POST"])
+@limiter.limit("10/minute")
+def tamar_calculation_endpoint():
+    return handle_tamar_calculation()
 
 
 # Error handlers
