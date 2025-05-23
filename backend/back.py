@@ -51,6 +51,29 @@ df = None
 embeddings = None
 indices = None
 
+# API key validation
+def validate_api_key():
+    api_key = request.headers.get('X-API-Key')
+    if not api_key:
+        return False
+    
+    # Get API key from environment variable
+    valid_api_key = os.getenv('BACKEND_API_KEY')
+    if not valid_api_key:
+        # Log warning but don't expose this to the client
+        print("Warning: BACKEND_API_KEY environment variable not set")
+        return False
+        
+    return api_key == valid_api_key
+
+# API key authentication decorator
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not validate_api_key():
+            return jsonify({"error": "Unauthorized - Invalid or missing API key"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Utility functions
 def cosine_similarity(A, B):
@@ -392,6 +415,7 @@ def movie_details_endpoint(tconst):
 
 @app.route("/api/tamar-calculation", methods=["POST"])
 @limiter.limit("10/minute")
+@require_api_key
 def tamar_calculation_endpoint():
     return handle_tamar_calculation()
 
